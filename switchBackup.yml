@@ -1,0 +1,29 @@
+#!/usr/bin/ansible-playbook 
+---
+- name: backup all cisco switches
+  hosts: switches
+  gather_facts: no
+  connection: local
+  vars_files: creds.yml
+  vars:
+    backup_root: backup
+  tasks:
+  - name: get cisco config
+    ios_command:
+      commands: 
+      - show running-config
+      provider: "{{ creds }}"
+    register: config
+  - name: ensure backup folder is created
+    file:
+      path: "{{ backup_root }}/"
+      state: directory
+    run_once: yes
+  - name: get timestamp
+    command: date +%Y%m%d
+    register: timestamp
+  - name: save output to {{ backup_root }}
+    copy: 
+      content: "{{ config.stdout[0] }}"
+      dest: "{{ backup_root }}/show_run_{{ inventory_hostname }}_{{ timestamp.stdout }}.txt"
+...

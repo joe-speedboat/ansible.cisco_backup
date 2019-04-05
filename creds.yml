@@ -1,0 +1,9 @@
+---
+# credentials for cisco switches
+creds:
+  host: "{{ inventory_hostname }}"
+  username: admin
+  password: ****
+  auth_pass: ****
+  authorize: yes
+...
