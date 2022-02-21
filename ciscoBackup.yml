@@ -23,22 +23,21 @@
     - "^! Last configuration change at .*"
     - "^! NVRAM config last updated at .*"
 
+
 - name: backup all cisco asa firewall configs
   hosts: firewall_asa
   gather_facts: no
   tasks:
   - name: get cisco firewall config
-    asa_command:
-      commands:
-      - show running-config
-    register: config
+    asa_config:
+      backup: yes
+      lines: ''
+      backup_options:
+        filename: "{{ inventory_hostname }}_show_run.txt"
+        dir_path: "{{ config_backup_dir_cisco }}"
   - name: save running config to device
     ios_config:
       save_when: always
-  - name: save output to file
-    copy:
-      content: "{{ config.stdout[0] }}"
-      dest: "{{ config_backup_dir_cisco }}/{{ inventory_hostname }}_show_run.txt"
 
 - name: backup all cisco wlan controller configs
   hosts: wlan_controller
@@ -49,8 +48,11 @@
       backup: yes
       lines: ''
       backup_options:
-        filename: backup_{{ inventory_hostname }}.txt
+        filename: "backup_{{ inventory_hostname }}.txt"
         dir_path: "{{ config_backup_dir_cisco }}"
+  - name: save running config to device
+    aireos_config:
+      save_when: always
   - name: remove some lines to make config git ready
     lineinfile:
       path: "{{ config_backup_dir_cisco }}/backup_{{ inventory_hostname }}.txt"
