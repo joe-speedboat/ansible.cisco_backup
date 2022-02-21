@@ -1,0 +1,8 @@
+[switch]
+switch-01
+
+[firewall_asa]
+fw-asa-01
+
+[wlan_controller]
+wlan-controller-01

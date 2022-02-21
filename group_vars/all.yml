@@ -1,0 +1,5 @@
+---
+# group_vars/all.yml
+config_backup_dir_cisco: /etc/git/cisco_backup
+...
+

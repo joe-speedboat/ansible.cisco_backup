@@ -1,0 +1,90 @@
+---
+- name: backup all cisco switch configs
+  hosts: switch
+  gather_facts: no
+  tasks:
+  - name: backup config (ios)
+    ios_config:
+      backup_options:
+        dir_path: "{{ config_backup_dir_cisco }}"
+        filename: "{{ inventory_hostname_short }}_show_run.txt"
+      backup: yes
+  - name: save running config to device
+    ios_config:
+      save_when: always
+  - name: remove some lines to make config git ready
+    lineinfile:
+      path: "{{ config_backup_dir_cisco }}/{{ inventory_hostname_short }}_show_run.txt"
+      state: absent
+      regexp: '{{ item }}'
+    with_items:
+    - "^Building configuration..."
+    - "^Current configuration : .*"
+    - "^! Last configuration change at .*"
+    - "^! NVRAM config last updated at .*"
+
+- name: backup all cisco asa firewall configs
+  hosts: firewall_asa
+  gather_facts: no
+  tasks:
+  - name: get cisco firewall config
+    asa_command:
+      commands:
+      - show running-config
+    register: config
+  - name: save running config to device
+    ios_config:
+      save_when: always
+  - name: save output to file
+    copy:
+      content: "{{ config.stdout[0] }}"
+      dest: "{{ config_backup_dir_cisco }}/{{ inventory_hostname }}_show_run.txt"
+
+- name: backup all cisco wlan controller configs
+  hosts: wlan_controller
+  gather_facts: no
+  tasks:
+  - name: backup wlan controller
+    aireos_config:
+      backup: yes
+      lines: ''
+      backup_options:
+        filename: backup_{{ inventory_hostname }}.txt
+        dir_path: "{{ config_backup_dir_cisco }}"
+  - name: remove some lines to make config git ready
+    lineinfile:
+      path: "{{ config_backup_dir_cisco }}/backup_{{ inventory_hostname }}.txt"
+      state: absent
+      regexp: '{{ item }}'
+    with_items:
+    - "rogue .* alert "
+    - "rogue .* Unknown "
+  - name: remove multiple white lines to make config git ready
+    shell:
+      sed -i '/^$/N;/^\n$/D' "{{ config_backup_dir_cisco }}/backup_{{ inventory_hostname }}.txt"
+
+- name: push all configs to git repo
+  hosts: localhost
+  vars:
+    ansible_become: false
+  tasks:
+  - name: push all configs to git repo
+    local_action: 
+      module: shell
+      cmd: |
+        DATE=$(date +%Y%m%d)
+        cd "{{ config_backup_dir_cisco }}" || exit 1
+        echo "========== LIST REPO FILES =========="
+        ls -altr
+        echo "========== UPDATE GIT REPO =========="
+        git add -A
+        git tag -a $DATE -m $DATE
+        git commit -a -m $DATE
+        git push
+        git push --tags
+        echo "========== FINISHED, BYE BYE ========"
+    register: git_cmd
+  - name: print results
+    debug:
+      var: git_cmd.stdout_lines
+
