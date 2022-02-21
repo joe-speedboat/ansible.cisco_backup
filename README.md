@@ -7,7 +7,7 @@ This is a playbook to backup cisco switch configuration, made to run on a daily 
 
 ## Variables
   It is strongly recommended to protect the passwords in group_vars at least in a vault   
-  https://github.com/joe-speedboat/workshop.ansible/blob/master/20 Protect variables with vaults.md
+  https://github.com/joe-speedboat/workshop.ansible/blob/master/20%20Protect%20variables%20with%20vaults.md
 * check ansible config for
   * vault settings    
   * group_vars
