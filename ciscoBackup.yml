@@ -67,6 +67,7 @@
 
 - name: push all configs to git repo
   hosts: localhost
+  connection: local
   vars:
     ansible_become: false
   tasks:
