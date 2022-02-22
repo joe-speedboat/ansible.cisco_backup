@@ -66,3 +66,14 @@ ansible-inventory --list --vars
             }
 ...snip...
 ```
+
+# Gitea diff hint
+1. https://git.domain.local/TeamX/backup.cisco    
+2. Branch > Tag > choose Date X (eg. 20210101)    
+3. Choose Device Config (z.B. as-a-225-02_show_run.txt)    
+   Now, device config for day X is showing up    
+4. Click History    
+   Now you see all possible versions of this file, which are older than X    
+5. On column "Message" choose date Y (eg. 20201218)    
+   Now you see the diff, "split view" option may help to compare the configs    
+
