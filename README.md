@@ -23,10 +23,10 @@ This is a playbook to backup cisco switch configuration, made to run on a daily 
 ## Dependencies
 * You need an existing git repo with deployment key    
   for the backup location: ```config_backup_dir_cisco```
-* You need the ansible collections    
-  depending on your ansible version and device types:
-  * ```ansible-galaxy collection install community.network```
+* You need the ansible collections depending on your ansible version and device types:
   * https://docs.ansible.com/ansible/5/collections/community/network/
+* With this command you can install the needed collections for this specific playbook int the project:
+  ```ansible-galaxy collection install -r collections/requirements.yml -p collections/```
 
 ## License
 https://opensource.org/licenses/LGPL-3.0    
